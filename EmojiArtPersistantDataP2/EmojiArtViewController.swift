@@ -8,8 +8,119 @@
 
 import UIKit
 
+/*
+Some people say if you put an extension here EmojiArt.EmojiInfo you have just added UI to your model
+ No this is my controller now the fact that my controller is implementing this as in part of extension
+ This extension lives in my controller and thats perfectly legal to do
+ And you will see iOS do that like something like NSAttributedString which is aactually in Foundation not a UI thing
+ but when you start adding font and stuff like that now it start becoming UI Thing
+ all that stuff is implemented in UIKit by extension NSAttributedString , they are doing the same thing over there
+*/
+/*
+ So I decided to do it with intializer instead of adding new function
+ It initializes it with label
+ */
+extension EmojiArt.EmojiInfo{
+    
+    //MARK:- Failable Initializer you return nil
+    init?(label : UILabel){
+        
+        if let attributedText = label.attributedText , let font = attributedText.font{
+            
+            x = Int(label.center.x)
+            
+            y = Int(label.center.y)
+            
+            text = attributedText.string
+            
+            size = Int(font.pointSize)
+            
+        }else{
+            
+            return nil
+            
+        }
+        
+    }
+    
+}
+
+
 class EmojiArtViewController: UIViewController,UIDropInteractionDelegate,UIScrollViewDelegate , UICollectionViewDataSource,UICollectionViewDelegate, UICollectionViewDelegateFlowLayout , UICollectionViewDragDelegate,UICollectionViewDropDelegate{
 
+    //MARK: - Model
+    
+    //We could have model just stored like this anh have some functions to look at all UILabel and grab the URL and build the emojiArt and return it
+    //But we can make this a computed property , but why I am doing it
+    /*
+     Any time when someone wants my model I am gonna look through my UI and make it for them (get)
+and any time someone sets my model I am gonna go update my UI to be like that way this things cant never be out of sync
+     myModel be always be perfect match with my UI and that is a really good thing to have in a controller
+     The model and UI are always in sync
+ */
+    var emojiArt : EmojiArt?{
+        
+        get{
+            
+            if let url = emojiArtBackImage.url{
+                
+                //flatMap if returns nil it ignores it
+               // let emojis = emojiArtView.subviews.flatMap{$0 as? UILabel}
+                
+               // let emojis = emojiArtView.subviews.flatMap{$0 as? UILabel}.flatMap { EmojiArt.EmojiInfo(label: $0)}
+                let emojis = emojiArtView.subviews.compactMap{$0 as? UILabel}.compactMap { EmojiArt.EmojiInfo(label: $0)}
+                
+                /* Now we have emojiLabels
+                 Now we have to turn it into array of EmojiInfo
+                 We gonna do that by writing an extension to struct EmojiInfo
+                 Im gonna put that extension in over my controller because that extension is gonna take UILabel as an argument and return an emojiInfo as the value that UILabel is a UI thing so that cannot be in my model but it can be in my controller
+                 */
+                
+                return EmojiArt(url: url, emojis: emojis)
+                
+            }
+            
+                return nil
+            
+        }
+        set{
+            
+            //Setting emojiArtBackImage to nil
+            emojiArtBackImage = (nil,nil)
+            
+            //removing all labels from emojiArtView
+            emojiArtView.subviews.flatMap { $0 as? UILabel   }.forEach { $0.removeFromSuperview()  }
+            
+            if let url = newValue?.url {
+                
+                imageFetcher = ImageFetcher(fetch: url, handler: { (url, image) in
+                    
+                    DispatchQueue.main.async {
+                        
+                        self.emojiArtBackImage = (url,image)
+                        
+                        
+                        
+                        newValue?.emojis.forEach{
+                            
+                            let attributedText = $0.text.attributedString(withTextStyle: .body, ofSize: CGFloat($0.size))
+                            
+                            self.emojiArtView.addLabel(with: attributedText, centeredAt:  CGPoint(x: $0.x, y: $0.y))
+                        }
+                        
+                    }
+                    
+                })
+                
+            }
+            
+        }
+        
+    }
+    
+    //what's inside emojiArt document there's URL in the background and then there are all those emoji what they are where they are and how big they are that's what emojiArt document looks like 
+    
+    
     @IBOutlet weak var dropZone: UIView! {
         didSet{
             dropZone.addInteraction(UIDropInteraction(delegate: self))
@@ -42,14 +153,21 @@ class EmojiArtViewController: UIViewController,UIDropInteractionDelegate,UIScrol
         return emojiArtView
     }
     
-    var emojiArtBackImage : UIImage?{
+    //For storing ImageURL
+    // And I am not gonna set it from here I am always gonna set it from emojiArtBackImage but just gonna use it as storage
+    // some people might put _ in front of this  like _emojiArtBackgroundImageURL
+    // To emphasize this is background storage we are not ever gonna set this directly we gonna set the URL in emojiArtBackImage
+    private var _emojiArtBackgroundImageURL : URL?
+    
+    var emojiArtBackImage : (url : URL?,image : UIImage?){
         get{
-            return emojiArtView.backgroundImage
+            return (_emojiArtBackgroundImageURL,emojiArtView.backgroundImage)
         }
         set{
+            _emojiArtBackgroundImageURL = newValue.url
             scrollView?.zoomScale = 1.0
-            emojiArtView.backgroundImage = newValue
-            let size = newValue?.size ?? CGSize.zero
+            emojiArtView.backgroundImage = newValue.image
+            let size = newValue.image?.size ?? CGSize.zero
             emojiArtView.frame = CGRect(origin: CGPoint.zero, size: size)
             scrollView?.contentSize = size
             
@@ -83,7 +201,12 @@ class EmojiArtViewController: UIViewController,UIDropInteractionDelegate,UIScrol
         
         imageFetcher = ImageFetcher(){ (url,image) in
             DispatchQueue.main.async {
-                self.emojiArtBackImage = image
+                //Making var of UIImage a tuple
+                /* Why make it tuple?
+                 Because I want url and image to always be set together I dont want to set accidentally set the URL and be image be different
+                 So I am always gonna set them together
+                 */
+                self.emojiArtBackImage = (url,image)
             }
         }
         

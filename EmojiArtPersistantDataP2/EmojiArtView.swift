@@ -45,7 +45,9 @@ class EmojiArtView: UIView,UIDropInteractionDelegate {
         }
     }
     
-    private func addLabel(with attributedString : NSAttributedString , centeredAt point : CGPoint){
+    //remember I am controller over there and controller can call anything it want in the view , view cant call anything in controller without blind structured communication but controller can call anything it want in it
+    // so made it public from private
+     func addLabel(with attributedString : NSAttributedString , centeredAt point : CGPoint){
         let label = UILabel()
         label.backgroundColor = .clear
         label.attributedText = attributedString
