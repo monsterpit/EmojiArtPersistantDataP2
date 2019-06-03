@@ -58,6 +58,11 @@ and any time someone sets my model I am gonna go update my UI to be like that wa
      myModel be always be perfect match with my UI and that is a really good thing to have in a controller
      The model and UI are always in sync
  */
+    
+    /*
+     Now we are in great shape now we have a model that we can set and get that makes our UI work and all we need to do is make it persistent , Make it store on the disk
+     And we gonna make it persistent with having emojiArt thing over there become codable and turn itself into JSON and then we gonna use JSON as our file format 
+ */
     var emojiArt : EmojiArt?{
         
         get{

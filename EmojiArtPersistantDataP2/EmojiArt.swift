@@ -8,15 +8,15 @@
 
 import Foundation
 
-
-struct EmojiArt
+//Lets make it generate JSON
+struct EmojiArt : Codable
 {
     
     var url : URL
     
     var emojis = [EmojiInfo]()
     
-    struct EmojiInfo {
+    struct EmojiInfo : Codable {
         //position x and y and its text and size i.e. font Size
         // we have Int instead of CGFloat remember these is a Model so it can be anything so it can also be double
         //I decided to have Int because I want my JSON to look nice 
@@ -31,6 +31,13 @@ struct EmojiArt
     }
     
     
+    // To get JSON version of EmojiArt
+    var json : Data? {
+        
+        return try? JSONEncoder().encode(self)
+        
+    }
+
     init(url : URL , emojis : [EmojiInfo]) {
         
         self.url = url
