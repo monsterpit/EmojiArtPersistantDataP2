@@ -132,12 +132,42 @@ and any time someone sets my model I am gonna go update my UI to be like that wa
         if let json = emojiArt?.json{
             
             //when you have data and you have to print it has a string you have to tell the system what the encoding is... like ascii , unicode
-            // but JSON is always utf8  (unicode 8 bit encoding )
-            if let jsonString = String(data: json, encoding: .utf8){
+//            // but JSON is always utf8  (unicode 8 bit encoding )
+//            if let jsonString = String(data: json, encoding: .utf8){
+//
+//                print(jsonString)
+//
+//            }
+            
+          
+            /*
+             Anytime you are talking about fileSystem
+             1) thing you have to do is find the directory in the sandbox to start , you always do it , when gonna write something in file system or read from file system you got to figure out which sandbox directory you are starting
+             
+             So this is the document so I am gonna put it in my document directory
+             
+             */
+            if let url = try? FileManager.default.url(
+                for: .documentDirectory,   // we are looking for document directory
+                in: .userDomainMask,       // we always do userDomainMask
+                appropriateFor: nil,       // we are not replacing file so we dont care about that
+                create: true               // and we want to create a document directory if it hasnt
+            ).appendingPathComponent("Untitled.json") // appending name of file to directory location
+            {
                 
-                print(jsonString)
+                do{
+                  //what URL we gonna write it to and this throws
+                try json.write(to: url)
+                     print ("Saved successfully")
+                    
+                }catch let error{
+                    print ("couldnt save \(error)")
+                }
                 
             }
+            
+           
+            
             
         }
         
