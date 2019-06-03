@@ -534,3 +534,26 @@ and any time someone sets my model I am gonna go update my UI to be like that wa
 
 }
 
+
+
+/*
+ It's saying saving in console but we cant see it being saved
+ Actually we can go look if it saved and go find this document in document directory because we have the iOS 11 files app
+ Which lets us looks  at documents in apps which opts in
+ The key there is apps that opt in
+ So we have to put that little info.plist that we where talking about
+ we are in app where you can look in our document directory and see our documents
+ 
+ Adding
+ Support Document Browser    in info.plist
+ and that tells the system you can look in my document directory and see throught my documents
+ 
+ 
+ When we view it we view it in JSON
+ 
+ Because we are not JSON Viewing APP we are EmojiArt App
+ So files app doesnt know we are the one to open that
+ And to fix that we have to define a new file type called emojiArt
+ and then the files app will know that's the emojiArt
+ But right now it looks at extension .JSON and it says its a json
+  */
