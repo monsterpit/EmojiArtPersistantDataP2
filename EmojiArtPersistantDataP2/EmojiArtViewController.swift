@@ -125,6 +125,23 @@ and any time someone sets my model I am gonna go update my UI to be like that wa
     
     //what's inside emojiArt document there's URL in the background and then there are all those emoji what they are where they are and how big they are that's what emojiArt document looks like 
     
+
+    @IBAction func save(_ sender: UIBarButtonItem) {
+        
+        //emojiArt?.json its a data though
+        if let json = emojiArt?.json{
+            
+            //when you have data and you have to print it has a string you have to tell the system what the encoding is... like ascii , unicode
+            // but JSON is always utf8  (unicode 8 bit encoding )
+            if let jsonString = String(data: json, encoding: .utf8){
+                
+                print(jsonString)
+                
+            }
+            
+        }
+        
+    }
     
     @IBOutlet weak var dropZone: UIView! {
         didSet{

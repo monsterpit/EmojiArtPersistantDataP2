@@ -33,6 +33,12 @@ struct EmojiArt : Codable
     
     // To get JSON version of EmojiArt
     var json : Data? {
+
+        //     for pretty print
+//        let encoder = JSONEncoder()
+//        encoder.outputFormatting = .prettyPrinted
+//
+//        return try? encoder.encode(self)
         
         return try? JSONEncoder().encode(self)
         
